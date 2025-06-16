@@ -1,7 +1,21 @@
-import yfinance as yf
 
-def get_btc_data(period="60d", interval="1d"):
-    btc = yf.Ticker("BTC-USD")
-    df = btc.history(period=period, interval=interval)
-    df = df[['Open', 'High', 'Low', 'Close', 'Volume']]
-    return df
+import yfinance as yf
+import pandas as pd
+import streamlit as st
+
+def get_btc_data():
+    try:
+        df = yf.download("BTC-USD", period="14d", interval="1h")
+        if df is not None and not df.empty:
+            df = df.dropna()
+            df['Return'] = df['Close'].pct_change()
+            df = df.dropna()
+            st.write("✅ Data loaded:", len(df), "rows")
+            st.dataframe(df.tail(5))
+            return df
+        else:
+            st.error("❌ Failed to fetch BTC data.")
+            return pd.DataFrame()
+    except Exception as e:
+        st.error(f"❌ Exception while fetching data: {e}")
+        return pd.DataFrame()
