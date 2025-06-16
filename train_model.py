@@ -2,7 +2,6 @@
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
-import pandas as pd
 
 def prepare_data(df):
     df['target'] = (df['price'].shift(-1) > df['price']).astype(int)
@@ -20,7 +19,6 @@ def train_and_predict(df):
     return model, report
 
 def generate_score(report):
-    # Use weighted avg f1-score as basis for score
     try:
         f1 = report["weighted avg"]["f1-score"]
         if f1 > 0.8:
