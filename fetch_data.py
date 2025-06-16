@@ -1,21 +1,34 @@
 
-import yfinance as yf
+import requests
 import pandas as pd
 import streamlit as st
+from datetime import datetime
 
 def get_btc_data():
     try:
-        df = yf.download("BTC-USD", period="14d", interval="1h")
-        if df is not None and not df.empty:
-            df = df.dropna()
-            df['Return'] = df['Close'].pct_change()
-            df = df.dropna()
-            st.write("✅ Data loaded:", len(df), "rows")
-            st.dataframe(df.tail(5))
-            return df
-        else:
-            st.error("❌ Failed to fetch BTC data.")
+        url = "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart"
+        params = {
+            "vs_currency": "usd",
+            "days": "90",
+            "interval": "daily"
+        }
+        response = requests.get(url, params=params)
+        data = response.json()
+        prices = data["prices"]
+
+        df = pd.DataFrame(prices, columns=["timestamp", "price"])
+        df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
+        df.set_index("timestamp", inplace=True)
+        df["Return"] = df["price"].pct_change()
+        df.dropna(inplace=True)
+
+        if df.empty:
+            st.error("❌ CoinGecko returned no data.")
             return pd.DataFrame()
+
+        st.success(f"✅ Loaded {len(df)} rows from CoinGecko")
+        st.dataframe(df.tail(5))
+        return df
     except Exception as e:
-        st.error(f"❌ Exception while fetching data: {e}")
+        st.error(f"❌ Error fetching CoinGecko data: {e}")
         return pd.DataFrame()
