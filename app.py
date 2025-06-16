@@ -1,49 +1,37 @@
 
 import streamlit as st
 import pandas as pd
-from fetch_data import get_btc_data
-from technicals import add_technicals
-from sentiment import get_sentiment_score, analyze_whale_sentiment
-from train_model import train_and_predict, generate_score
 import plotly.graph_objects as go
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
 
-st.set_page_config(page_title="Crypto Trend Predictor", layout="wide")
+st.set_page_config(page_title="Crypto Predictor", layout="wide")
+
+# Load data
+df = pd.read_csv("btc_data.csv")
+df["target"] = (df["Close"].shift(-1) > df["Close"]).astype(int)
+df.dropna(inplace=True)
+
+# Features and target
+X = df[["Return", "whale_trend"]]
+y = df["target"]
+
+# Model training
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+model = RandomForestClassifier(n_estimators=100)
+model.fit(X_train, y_train)
+pred = model.predict(X_test)[-1]
+
+# Visualization
 st.title("📊 Crypto Trend Predictor")
+st.plotly_chart(go.Figure(go.Scatter(x=df['date'], y=df['Close'], mode='lines', name='BTC Close Price')))
 
-try:
-    df = get_btc_data()
-    if df.empty or len(df) < 20:
-        st.error("🚫 Not enough data to make a prediction. Please check your source or wait for market activity.")
-    else:
-        df = add_technicals(df)
-        model, report = train_and_predict(df)
-        score = generate_score(report)
+# Investment meter
+st.subheader("Should I invest?")
+if pred == 1:
+    st.success("✅ YES — Our model suggests upward movement.")
+else:
+    st.error("🚫 NO — Our model suggests caution.")
 
-        st.subheader("📈 BTC Price Chart")
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(x=df['date'], y=df['price'], mode='lines', name='BTC Price'))
-        st.plotly_chart(fig, use_container_width=True)
-
-        st.subheader("🧠 Sentiment + Whale Activity")
-        sentiment_score = get_sentiment_score()
-        whale_summary = analyze_whale_sentiment()
-
-        st.metric("Sentiment Score", sentiment_score)
-        st.write("📋 Whale Insight Summary:")
-        st.info(whale_summary)
-
-        st.subheader("🤖 Predictor Meter")
-        if score >= 80:
-            verdict = "Strong Buy"
-        elif score >= 60:
-            verdict = "Buy"
-        elif score >= 50:
-            verdict = "Neutral"
-        else:
-            verdict = "Avoid"
-
-        st.progress(score)
-        st.success(f"Model Score: {score} — Recommendation: **{verdict}**")
-
-except Exception as e:
-    st.error(f"❌ Failed to fetch BTC data or model error: {e}")
+st.markdown("---")
+st.caption("Note: This tool is for educational purposes only.")
