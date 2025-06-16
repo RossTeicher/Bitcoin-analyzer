@@ -1,0 +1,9 @@
+yfinance
+pandas
+scikit-learn
+matplotlib
+ta
+textblob
+transformers
+torch
+requests
