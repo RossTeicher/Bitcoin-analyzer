@@ -9,3 +9,5 @@ torch
 requests
 streamlit
 plotly
+
+plotly==6.1.2
