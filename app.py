@@ -7,7 +7,12 @@ import plotly.graph_objects as go
 
 st.title("📊 Crypto Trend Predictor")
 
+
 df = get_btc_data()
+if df is None or df.empty or len(df) < 10:
+    st.error("🚫 Not enough data to make a prediction. Please check your data source.")
+    st.stop()
+
 df = add_technicals(df)
 
 st.subheader("Bitcoin Price (Last 60 Days)")
