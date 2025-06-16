@@ -4,13 +4,18 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 
 def prepare_data(df):
-    df['target'] = (df['price'].shift(-1) > df['price']).astype(int)
+    if 'Close' not in df.columns or df.empty:
+        raise ValueError("Data must include a 'Close' column with values.")
+    df['target'] = (df['Close'].shift(-1) > df['Close']).astype(int)
+    df['Return'] = df['Close'].pct_change()
     df.dropna(inplace=True)
-    X = df[['price', 'Return']]
+    X = df[['Close', 'Return']]
     y = df['target']
     return train_test_split(X, y, test_size=0.2, random_state=42)
 
 def train_and_predict(df):
+    if df.shape[0] < 10:
+        raise ValueError("Not enough data to train model.")
     X_train, X_test, y_train, y_test = prepare_data(df)
     model = RandomForestClassifier(n_estimators=100, random_state=42)
     model.fit(X_train, y_train)
