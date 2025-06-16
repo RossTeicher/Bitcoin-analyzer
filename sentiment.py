@@ -1,17 +1,24 @@
-from transformers import pipeline
-import re
 
-sentiment_pipeline = pipeline("sentiment-analysis")
+import random
+import pandas as pd
 
-def clean_text(text):
-    text = re.sub(r"http\S+", "", text)
-    text = re.sub(r"[^A-Za-z0-9\s]", "", text)
-    return text.strip()
+def get_sentiment_score():
+    # Simulate a sentiment score for now
+    return random.uniform(0.3, 0.9)
 
-def get_sentiment_score(text):
-    result = sentiment_pipeline(clean_text(text))[0]
-    return 1 if result["label"] == "POSITIVE" else -1
+def analyze_whale_sentiment():
+    # Simulate whale alerts using random large transactions
+    whale_alerts = []
+    for i in range(random.randint(2, 5)):
+        whale_alerts.append({
+            "id": i,
+            "coin": "BTC",
+            "type": random.choice(["Buy", "Sell"]),
+            "amount": random.randint(1000, 10000)
+        })
+    return whale_alerts
 
-def analyze_whale_sentiment(alerts):
-    scores = [get_sentiment_score(alert) for alert in alerts]
-    return sum(scores) / len(scores)
+def generate_sentiment_heatmap():
+    hours = [f"{i}:00" for i in range(24)]
+    sentiment_data = [random.uniform(0.2, 0.9) for _ in range(24)]
+    return pd.DataFrame({"Hour": hours, "Sentiment": sentiment_data})

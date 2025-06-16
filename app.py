@@ -35,7 +35,24 @@ fig.add_trace(go.Scatter(x=hist.index, y=hist['Close'], mode='lines', name='BTC 
 fig.update_layout(title='📈 Bitcoin 7-Day Trend', xaxis_title='Time', yaxis_title='Price (USD)')
 st.plotly_chart(fig)
 
-# --- PREDICTOR METER ---
+
+# --- WHALE ALERTS ---
+st.subheader("🐋 Whale Alerts")
+whales = analyze_whale_sentiment()
+for whale in whales:
+    st.write(f"Whale {whale['id']}: {whale['type']} {whale['amount']} {whale['coin']}")
+
+# --- SENTIMENT HEATMAP ---
+import plotly.express as px
+st.subheader("🔥 Sentiment Heatmap (24h)")
+heatmap_df = generate_sentiment_heatmap()
+fig2 = px.imshow([heatmap_df['Sentiment']], 
+                 labels=dict(x="Hour", color="Sentiment Score"),
+                 x=heatmap_df["Hour"],
+                 y=["Score"],
+                 aspect="auto")
+st.plotly_chart(fig2)
+
 score = generate_score()
 st.subheader("🎯 Should I Buy?")
 if score > 0.7:
