@@ -1,3 +1,3 @@
-# Crypto Predictor
+# Streamlit Crypto Dashboard
 
-An AI-enhanced algorithm to predict crypto trends using technicals, news sentiment, whale activity, and a simplified investor recommendation meter.
+A user-friendly, AI-enhanced dashboard for predicting Bitcoin trends using sentiment analysis, technical indicators, and a visual investment meter.
