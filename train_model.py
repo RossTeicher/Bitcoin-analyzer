@@ -18,3 +18,20 @@ def train_and_predict(df):
     preds = model.predict(X_test)
     report = classification_report(y_test, preds, output_dict=True)
     return model, report
+
+def generate_score(report):
+    # Use weighted avg f1-score as basis for score
+    try:
+        f1 = report["weighted avg"]["f1-score"]
+        if f1 > 0.8:
+            return 90
+        elif f1 > 0.7:
+            return 75
+        elif f1 > 0.6:
+            return 60
+        elif f1 > 0.5:
+            return 50
+        else:
+            return 30
+    except:
+        return 0
