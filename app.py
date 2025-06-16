@@ -1,26 +1,21 @@
 import streamlit as st
-from src.fetch_data import get_btc_data
-from src.technicals import add_technicals
-from src.sentiment import get_sentiment_score, analyze_whale_sentiment
-from src.train_model import train_and_predict
+from fetch_data import get_btc_data
+from technicals import add_technicals
+from sentiment import get_sentiment_score, analyze_whale_sentiment
+from train_model import train_and_predict
 import matplotlib.pyplot as plt
 
-# Title
 st.title("📊 Crypto Trend Predictor")
 
-# Get BTC data and compute indicators
 df = get_btc_data()
 df = add_technicals(df)
 
-# Show BTC chart
 st.subheader("Bitcoin Price (Last 60 Days)")
 st.line_chart(df['Close'])
 
-# Show indicators
 st.subheader("Technical Indicators")
 st.line_chart(df[['rsi', 'macd', 'macd_diff']])
 
-# Simulate user input for sentiment
 st.subheader("Sentiment Analysis")
 news = st.text_area("Paste crypto news headlines (one per line)", 
 '''
@@ -34,7 +29,6 @@ avg_sentiment = sum(sentiment_scores) / len(sentiment_scores) if sentiment_score
 
 st.write("Average News Sentiment Score:", avg_sentiment)
 
-# Whale sentiment (preset for now)
 whale_alerts = [
     "Whale sends 2,000 BTC to Binance",
     "1,000 BTC moved from Coinbase to cold wallet"
@@ -42,7 +36,6 @@ whale_alerts = [
 whale_sentiment = analyze_whale_sentiment(whale_alerts)
 st.write("Whale Sentiment Score:", whale_sentiment)
 
-# Train model and show prediction
 st.subheader("Model Prediction")
 model = train_and_predict(df)
 last_row = df.iloc[-1][['rsi', 'macd', 'macd_diff']].values.reshape(1, -1)
