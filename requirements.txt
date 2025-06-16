@@ -11,3 +11,4 @@ streamlit
 plotly
 
 plotly==6.1.2
+yfinance==0.2.31
